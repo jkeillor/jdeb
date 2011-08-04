@@ -43,6 +43,7 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
+import org.vafer.jdeb.conffiles.Conffiles;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
@@ -292,6 +293,7 @@ public class Processor {
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
 
         PackageDescriptor packageDescriptor = null;
+        Conffiles conffiles = null;
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
@@ -311,6 +313,11 @@ public class Processor {
             entry.setNames("root", "root");
             entry.setMode(PermMapper.toMode("755"));
 
+            if ("conffiles".equals(name)) {
+                conffiles = new Conffiles(new FileInputStream(file), resolver);
+                continue;
+            }
+            
             if ("control".equals(name)) {
                 packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
@@ -358,6 +365,10 @@ public class Processor {
         packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
 
         addEntry("control", packageDescriptor.toString(), outputStream);
+        
+        if (conffiles != null) {
+            addEntry("conffiles", conffiles.toString(), outputStream);
+        }
 
         addEntry("md5sums", pChecksums.toString(), outputStream);
 
