@@ -30,16 +30,6 @@
             <timezone>+1</timezone>
         </developer>
     </developers>
-    <contributors>
-        <contributor>
-            <name>Elliot West</name>
-            <email>elliot@last.fm</email>
-            <url>http://www.last.fm/user/teabot</url>
-            <organization>Last.fm</organization>
-            <organizationUrl>http://www.last.fm/</organizationUrl>
-            <timezone>0</timezone>
-        </contributor>
-    </contributors>
     <licenses>
         <license>
             <name>Apache License 2</name>
