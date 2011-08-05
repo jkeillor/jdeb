@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -218,6 +220,8 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
         variables.put("url", getProject().getUrl());
+        Properties properties = getProject().getProperties();
+        variables.putAll(properties);
         return new MapVariableResolver(variables);
     }
 
