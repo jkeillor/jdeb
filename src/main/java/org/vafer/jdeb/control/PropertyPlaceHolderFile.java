@@ -1,4 +1,4 @@
-package org.vafer.jdeb.conffiles;
+package org.vafer.jdeb.control;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -45,7 +45,7 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
-import org.vafer.jdeb.conffiles.PropertyPlaceHolderFile;
+import org.vafer.jdeb.control.PropertyPlaceHolderFile;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
