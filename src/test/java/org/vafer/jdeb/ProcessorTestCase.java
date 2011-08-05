@@ -19,6 +19,7 @@ package org.vafer.jdeb;
 import java.io.File;
 
 import junit.framework.TestCase;
+
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.vafer.jdeb.producers.DataProducerFileSet;

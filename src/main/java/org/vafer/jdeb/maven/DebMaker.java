@@ -89,7 +89,7 @@ public class DebMaker {
     public DebMaker(Console console, File deb, File controlDir, Collection<DataProducer> dataProducers, VariableResolver variableResolver) {
         this.console = console;
         this.deb = deb;
-        this.control = controlDir;
+        control = controlDir;
         this.variableResolver = variableResolver;
         if (dataProducers != null) {
             this.dataProducers = dataProducers;
@@ -107,15 +107,15 @@ public class DebMaker {
     }
 
     public void setChangesIn(File changes) {
-        this.changesIn = changes;
+        changesIn = changes;
     }
 
     public void setChangesOut(File changes) {
-        this.changesOut = changes;
+        changesOut = changes;
     }
 
     public void setChangesSave(File changes) {
-        this.changesSave = changes;
+        changesSave = changes;
     }
 
     public void setKeyring(File keyring) {
@@ -247,7 +247,7 @@ public class DebMaker {
                     changesIn), packageDescriptor);
 
             processor.createChanges(packageDescriptor, changesProvider,
-                    (keyring != null) ? new FileInputStream(keyring) : null,
+                    keyring != null ? new FileInputStream(keyring) : null,
                     key, passphrase, new FileOutputStream(changesOut));
 
         } catch (Exception e) {

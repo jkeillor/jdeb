@@ -45,7 +45,7 @@ public final class Utils {
         final StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < pBytes.length; ++i) {
-            sb.append(Integer.toHexString((pBytes[i]>>4) & 0x0f));
+            sb.append(Integer.toHexString(pBytes[i]>>4 & 0x0f));
             sb.append(Integer.toHexString(pBytes[i] & 0x0f));
         }
 
@@ -118,7 +118,7 @@ public final class Utils {
                         watch = close;
                     } else if (watch == close) {
                         // found close
-                        final String variable = (String) pResolver.get(sb.toString());
+                        final String variable = pResolver.get(sb.toString());
                         if (variable != null) {
                             out.append(variable);
                         } else {

@@ -228,7 +228,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     public TarEntry map( final TarEntry pEntry ) {
 
-        final TarEntry entry = (TarEntry) mapping.get(pEntry.getName());
+        final TarEntry entry = mapping.get(pEntry.getName());
 
         if (entry != null) {
 

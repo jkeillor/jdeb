@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.BCPGOutputStream;
+import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
@@ -91,7 +92,7 @@ public final class SigningUtils {
         final PGPSecretKey secretKey = getSecretKey(pKeyring, pKey);
         final PGPPrivateKey privateKey = secretKey.extractPrivateKey(pPassphrase.toCharArray(), "BC");
 
-        final int digest = PGPUtil.SHA1;
+        final int digest = HashAlgorithmTags.SHA1;
 
         final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(secretKey.getPublicKey().getAlgorithm(), digest, "BC");
         signatureGenerator.initSign(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);

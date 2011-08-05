@@ -92,7 +92,7 @@ public final class Data implements DataProducer {
             while (tok.hasMoreTokens()) {
                 tokens.add(tok.nextToken());
             }
-            result = (String[]) tokens.toArray(new String[tokens.size()]);
+            result = tokens.toArray(new String[tokens.size()]);
         }
         return result;
     }

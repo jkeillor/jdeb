@@ -412,7 +412,7 @@ public class Processor {
             public void onEachDir( String dirname, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 dirname = fixPath(dirname);
 
-                createParentDirectories((new File(dirname)).getParent(), user, uid, group, gid);
+                createParentDirectories(new File(dirname).getParent(), user, uid, group, gid);
 
                 // The directory passed in explicitly by the caller also gets the passed-in mode.  (Unlike
                 // the parent directories for now.  See related comments at "int mode =" in
@@ -425,7 +425,7 @@ public class Processor {
             public void onEachFile( InputStream inputStream, String filename, String linkname, String user, int uid, String group, int gid, int mode, long size ) throws IOException {
                 filename = fixPath(filename);
 
-                createParentDirectories((new File(filename)).getParent(), user, uid, group, gid);
+                createParentDirectories(new File(filename).getParent(), user, uid, group, gid);
 
                 TarEntry entry = new TarEntry(filename);
 

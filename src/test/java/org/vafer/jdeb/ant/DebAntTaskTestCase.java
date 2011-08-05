@@ -226,7 +226,7 @@ public final class DebAntTaskTestCase extends TestCase {
                 assertEquals("header 1", (byte) 'Z', in.read());
 
                 TarInputStream tar = new TarInputStream(new CBZip2InputStream(in));
-                while ((tar.getNextEntry()) != null);
+                while (tar.getNextEntry() != null);
                 tar.close();
                 break;
             } else {
@@ -261,7 +261,7 @@ public final class DebAntTaskTestCase extends TestCase {
                 found = true;
 
                 TarInputStream tar = new TarInputStream(new NonClosingInputStream(in));
-                while ((tar.getNextEntry()) != null);
+                while (tar.getNextEntry() != null);
                 tar.close();
             } else {
                 // skip to the next entry
