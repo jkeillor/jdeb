@@ -32,8 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
@@ -43,7 +45,7 @@ import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarOutputStream;
 import org.vafer.jdeb.changes.ChangeSet;
 import org.vafer.jdeb.changes.ChangesProvider;
-import org.vafer.jdeb.conffiles.Conffiles;
+import org.vafer.jdeb.conffiles.PropertyPlaceHolderFile;
 import org.vafer.jdeb.descriptors.ChangesDescriptor;
 import org.vafer.jdeb.descriptors.InvalidDescriptorException;
 import org.vafer.jdeb.descriptors.PackageDescriptor;
@@ -293,7 +295,7 @@ public class Processor {
     private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
 
         PackageDescriptor packageDescriptor = null;
-        Conffiles conffiles = null;
+        List<PropertyPlaceHolderFile> configurationFiles = new ArrayList<PropertyPlaceHolderFile>();
 
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
@@ -304,17 +306,13 @@ public class Processor {
             if (file.isDirectory()) {
                 continue;
             }
-
-            final TarEntry entry = new TarEntry(file);
-
+            
             final String name = file.getName();
-
-            entry.setName("./" + name);
-            entry.setNames("root", "root");
-            entry.setMode(PermMapper.toMode("755"));
-
-            if ("conffiles".equals(name)) {
-                conffiles = new Conffiles(new FileInputStream(file), resolver);
+            
+            Set<String> configurationFileNames = new HashSet<String>(Arrays.asList(new String[] {"conffiles","preinst","postinst","prerm","postrm"}));
+            if (configurationFileNames.contains(name)) {
+                PropertyPlaceHolderFile configurationFile = new PropertyPlaceHolderFile(name, new FileInputStream(file), resolver);
+                configurationFiles.add(configurationFile);
                 continue;
             }
             
@@ -346,6 +344,11 @@ public class Processor {
                 continue;
             }
 
+            final TarEntry entry = new TarEntry(file);
+            entry.setName("./" + name);
+            entry.setNames("root", "root");
+            entry.setMode(PermMapper.toMode("755"));
+            
             final InputStream inputStream = new FileInputStream(file);
 
             outputStream.putNextEntry(entry);
@@ -357,18 +360,18 @@ public class Processor {
             inputStream.close();
 
         }
-
+        
         if (packageDescriptor == null) {
             throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
         }
-
+        
         packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
+        
+        for (PropertyPlaceHolderFile configurationFile : configurationFiles) {
+            addEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
+        }
 
         addEntry("control", packageDescriptor.toString(), outputStream);
-        
-        if (conffiles != null) {
-            addEntry("conffiles", conffiles.toString(), outputStream);
-        }
 
         addEntry("md5sums", pChecksums.toString(), outputStream);
 
@@ -557,15 +560,14 @@ public class Processor {
 
     private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
-
         final TarEntry entry = new TarEntry("./" + pName);
         entry.setSize(data.length);
         entry.setNames("root", "root");
+        entry.setMode(PermMapper.toMode("755"));
 
         pOutput.putNextEntry(entry);
         pOutput.write(data);
         pOutput.closeEntry();
     }
-
 
 }

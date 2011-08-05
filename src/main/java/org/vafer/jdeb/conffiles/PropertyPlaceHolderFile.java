@@ -1,8 +1,8 @@
 package org.vafer.jdeb.conffiles;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -11,18 +11,16 @@ import java.util.List;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
-public class Conffiles {
+public class PropertyPlaceHolderFile {
 
-    private final FileInputStream fileInputStream;
-    private final VariableResolver resolver;
     private static String openToken = "[[";
     private static String closeToken = "]]";
     private List<String> lines = new ArrayList<String>();
+    private String name;
 
-    public Conffiles(FileInputStream pFileInputStream, VariableResolver pResolver) throws IOException, ParseException {
-        fileInputStream = pFileInputStream;
-        resolver = pResolver;
-        parse();
+    public PropertyPlaceHolderFile(String name, InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
+        this.name = name;
+        parse(pInputStream, pResolver);
     }
 
     public static void setOpenToken( final String pToken ) {
@@ -33,18 +31,13 @@ public class Conffiles {
         closeToken = pToken;
     }
 
-    private void parse() throws IOException, ParseException {
+    private void parse(InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new InputStreamReader(fileInputStream));
+            br = new BufferedReader(new InputStreamReader(pInputStream));
             String line;
-            int lineNumber = 0;
             while ((line = br.readLine()) != null) {
-                lineNumber++;
-                if (line.length() == 0) {
-                    throw new ParseException("Empty line", lineNumber);
-                }
-                lines.add(Utils.replaceVariables(resolver, line, openToken, closeToken));
+                lines.add(Utils.replaceVariables(pResolver, line, openToken, closeToken));
             }
         } finally {
             if (br != null) {
@@ -60,6 +53,10 @@ public class Conffiles {
             builder.append(line).append('\n');
         }
         return builder.toString();
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

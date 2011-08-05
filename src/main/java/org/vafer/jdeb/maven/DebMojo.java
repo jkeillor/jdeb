@@ -19,9 +19,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProjectHelper;
@@ -125,7 +128,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @parameter
      */
     private String classifier;
-
+    
     /**
      * "data" entries used to determine which files should be added to this deb.
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a
@@ -182,6 +185,7 @@ public class DebMojo extends AbstractPluginMojo {
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
     private Collection dataProducers = new ArrayList();
+
 
     public void setOpenReplaceToken(String openReplaceToken) {
         this.openReplaceToken = openReplaceToken;

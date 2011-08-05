@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
@@ -197,7 +198,7 @@ public class DebAntTask extends MatchingTask {
 
             log("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
+            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression );
 
         } catch (Exception e) {
             throw new BuildException("Failed to create debian package " + deb, e);

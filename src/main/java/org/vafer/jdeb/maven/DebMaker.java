@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import org.vafer.jdeb.Console;
 import org.vafer.jdeb.DataProducer;
@@ -75,8 +76,8 @@ public class DebMaker {
 
     private final VariableResolver variableResolver;
 
-
     private final Collection dataProducers;
+
 
     public DebMaker(Console console, VariableResolver variableResolver) {
         this(console, null, null, null, variableResolver);
