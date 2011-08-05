@@ -126,7 +126,7 @@ public class DebMojo extends AbstractPluginMojo {
      * @parameter
      */
     private String classifier;
-    
+
     /**
      * "data" entries used to determine which files should be added to this deb.
      * The "data" entries may specify a tarball (tar.gz, tar.bz2, tgz), a

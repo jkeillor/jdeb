@@ -33,7 +33,7 @@ import org.vafer.jdeb.producers.DataProducerLiteralPaths;
  * Maven "data" elment acting as a factory for DataProducers. So far Archive and
  * Directory producers are supported. Both support the usual ant pattern set
  * matching.
- * 
+ *
  * @author Bryan Sant <bryan.sant@gmail.com>
  */
 public final class Data implements DataProducer {

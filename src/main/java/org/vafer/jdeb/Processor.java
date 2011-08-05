@@ -306,16 +306,16 @@ public class Processor {
             if (file.isDirectory()) {
                 continue;
             }
-            
+
             final String name = file.getName();
-            
+
             Set<String> configurationFileNames = new HashSet<String>(Arrays.asList(new String[] {"conffiles","preinst","postinst","prerm","postrm"}));
             if (configurationFileNames.contains(name)) {
                 PropertyPlaceHolderFile configurationFile = new PropertyPlaceHolderFile(name, new FileInputStream(file), resolver);
                 configurationFiles.add(configurationFile);
                 continue;
             }
-            
+
             if ("control".equals(name)) {
                 packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
@@ -348,7 +348,7 @@ public class Processor {
             entry.setName("./" + name);
             entry.setNames("root", "root");
             entry.setMode(PermMapper.toMode("755"));
-            
+
             final InputStream inputStream = new FileInputStream(file);
 
             outputStream.putNextEntry(entry);
@@ -360,13 +360,13 @@ public class Processor {
             inputStream.close();
 
         }
-        
+
         if (packageDescriptor == null) {
             throw new FileNotFoundException("No control file in " + Arrays.toString(pControlFiles));
         }
-        
+
         packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
-        
+
         for (PropertyPlaceHolderFile configurationFile : configurationFiles) {
             addEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
         }
