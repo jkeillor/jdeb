@@ -60,8 +60,8 @@ public final class TextfileChangesProvider implements ChangesProvider {
         String distribution = pDescriptor.get("Distribution");
         String urgency = pDescriptor.get("Urgency");
         String changedBy = pDescriptor.get("Maintainer");
-        final Collection changesColl = new ArrayList();
-        final Collection changeSetColl = new ArrayList();
+        final Collection<String> changesColl = new ArrayList<String>();
+        final Collection<ChangeSet> changeSetColl = new ArrayList<ChangeSet>();
 
 
         while(true) {

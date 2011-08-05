@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.MatchingTask;
@@ -74,7 +73,7 @@ public class DebAntTask extends MatchingTask {
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
-    private Collection dataProducers = new ArrayList();
+    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
     public void setDestfile( File deb ) {

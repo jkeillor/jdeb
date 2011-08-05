@@ -38,7 +38,7 @@ import org.vafer.jdeb.producers.DataProducerFile;
  */
 public final class Data extends PatternSet implements DataProducer {
 
-    private final Collection mapperWrapper = new ArrayList();
+    private final Collection<Mapper> mapperWrapper = new ArrayList<Mapper>();
 
     private File src;
 
@@ -63,9 +63,9 @@ public final class Data extends PatternSet implements DataProducer {
         }
 
         org.vafer.jdeb.mapping.Mapper[] mappers = new org.vafer.jdeb.mapping.Mapper[mapperWrapper.size()];
-        final Iterator it = mapperWrapper.iterator();
+        final Iterator<Mapper> it = mapperWrapper.iterator();
         for (int i = 0; i < mappers.length; i++) {
-            mappers[i] = ((Mapper)it.next()).createMapper();
+            mappers[i] = it.next().createMapper();
         }
 
         if ("file".equalsIgnoreCase(type)) {

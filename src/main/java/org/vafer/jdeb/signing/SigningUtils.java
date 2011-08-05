@@ -50,14 +50,16 @@ public final class SigningUtils {
 
         final PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(pInput));
 
-        final Iterator rIt = pgpSec.getKeyRings();
+        @SuppressWarnings("unchecked")
+        final Iterator<PGPSecretKeyRing> rIt = pgpSec.getKeyRings();
 
         while (rIt.hasNext()) {
-            final PGPSecretKeyRing kRing = (PGPSecretKeyRing) rIt.next();
-            final Iterator kIt = kRing.getSecretKeys();
+            final PGPSecretKeyRing kRing = rIt.next();
+            @SuppressWarnings("unchecked")
+            final Iterator<PGPSecretKey> kIt = kRing.getSecretKeys();
 
             while (kIt.hasNext()) {
-                final PGPSecretKey k = (PGPSecretKey) kIt.next();
+                final PGPSecretKey k = kIt.next();
 
                 if (k.isSigningKey() && Long.toHexString(k.getKeyID() & 0xFFFFFFFFL).equals(pKey.toLowerCase())) {
                     return k;

@@ -38,7 +38,7 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public abstract class AbstractDescriptor {
 
-    private final Map values = new HashMap();
+    private final Map<String, String> values = new HashMap<String, String>();
     private final VariableResolver resolver;
     private static String openToken = "[[";
     private static String closeToken = "]]";
@@ -129,7 +129,7 @@ public abstract class AbstractDescriptor {
     }
 
     public String get( final String pKey ) {
-        return (String)values.get(pKey);
+        return values.get(pKey);
     }
 
     public abstract String[] getMandatoryKeys();
@@ -138,8 +138,8 @@ public abstract class AbstractDescriptor {
         return invalidKeys().size() == 0;
     }
 
-    public Set invalidKeys() {
-        final Set invalid = new HashSet();
+    public Set<String> invalidKeys() {
+        final Set<String> invalid = new HashSet<String>();
 
         final String[] mk = getMandatoryKeys();
         for (int i = 0; i < mk.length; i++) {
@@ -152,10 +152,10 @@ public abstract class AbstractDescriptor {
     }
 
     public String toString( final String[] pKeys ) {
-        final StringBuffer s = new StringBuffer();
+        final StringBuilder s = new StringBuilder();
         for (int i = 0; i < pKeys.length; i++) {
             final String key = pKeys[i];
-            final String value = (String) values.get(key);
+            final String value = values.get(key);
             if (value != null) {
                 s.append(key).append(":");
 
