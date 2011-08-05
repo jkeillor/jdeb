@@ -127,7 +127,7 @@ public class Processor {
             tempControl = File.createTempFile("deb", "control");
 
             console.println("Building data");
-            final StringBuffer md5s = new StringBuffer();
+            final StringBuilder md5s = new StringBuilder();
             final BigInteger size = buildData(pData, tempData, md5s, compression);
 
             console.println("Building control");
@@ -243,7 +243,7 @@ public class Processor {
         changesDescriptor.set("Checksums-Sha256", checksumsSha256.toString());
 
 
-        final StringBuffer files = new StringBuffer("\n");
+        final StringBuilder files = new StringBuilder("\n");
         files.append(' ').append(changesDescriptor.get("MD5"));
         files.append(' ').append(changesDescriptor.get("Size"));
         files.append(' ').append(changesDescriptor.get("Section"));
@@ -292,7 +292,7 @@ public class Processor {
      * @throws IOException
      * @throws ParseException
      */
-    private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuffer pChecksums, final File pOutput ) throws IOException, ParseException {
+    private PackageDescriptor buildControl( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException {
 
         PackageDescriptor packageDescriptor = null;
         List<PropertyPlaceHolderFile> configurationFiles = new ArrayList<PropertyPlaceHolderFile>();
@@ -390,7 +390,7 @@ public class Processor {
      * @throws NoSuchAlgorithmException
      * @throws IOException
      */
-    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuffer pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
+    BigInteger buildData( final DataProducer[] pData, final File pOutput, final StringBuilder pChecksums, String pCompression ) throws NoSuchAlgorithmException, IOException {
 
         OutputStream out = new FileOutputStream(pOutput);
         if ("gzip".equals(pCompression)) {

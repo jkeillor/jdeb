@@ -71,7 +71,7 @@ public final class ChangesDescriptor extends AbstractDescriptor {
         set("Urgency", lastestChangeSet.getUrgency());
         set("Changed-By", lastestChangeSet.getChangedBy());
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < 1; i++) {
             final ChangeSet changeSet = changeSets[i];

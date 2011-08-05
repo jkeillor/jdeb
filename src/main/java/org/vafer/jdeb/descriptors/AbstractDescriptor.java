@@ -62,7 +62,7 @@ public abstract class AbstractDescriptor {
 
     protected void parse( final InputStream pInput ) throws IOException, ParseException {
         final BufferedReader br = new BufferedReader(new InputStreamReader(pInput));
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         String key = null;
         int linenr = 0;
         while(true) {
@@ -91,7 +91,7 @@ public abstract class AbstractDescriptor {
                 if (buffer.length() > 0) {
                     // flush value of previous key
                     set(key, buffer.toString());
-                    buffer = new StringBuffer();
+                    buffer.setLength(0);
                 }
 
 
