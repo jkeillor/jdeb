@@ -63,6 +63,9 @@ import org.vafer.jdeb.utils.VariableResolver;
  */
 public class Processor {
 
+    private static final Set<String> CONFIGURATION_FILENAMES
+        = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" } ));
+    
     private final Console console;
     private final VariableResolver resolver;
 
@@ -300,65 +303,17 @@ public class Processor {
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
-        for (int i = 0; i < pControlFiles.length; i++) {
-            final File file = pControlFiles[i];
-
-            if (file.isDirectory()) {
-                continue;
+        for (File file : pControlFiles) {
+            if (file.isFile()) {
+                final String name = file.getName();
+                if (CONFIGURATION_FILENAMES.contains(name)) {
+                    addConfigurationFile(configurationFiles, file);
+                } else if ("control".equals(name)) {
+                    packageDescriptor = addPackageDescriptorEntry(file);
+                } else {
+                    addControlEntry(file, outputStream);
+                }
             }
-
-            final String name = file.getName();
-
-            Set<String> configurationFileNames = new HashSet<String>(Arrays.asList(new String[] {"conffiles","preinst","postinst","prerm","postrm"}));
-            if (configurationFileNames.contains(name)) {
-                PropertyPlaceHolderFile configurationFile = new PropertyPlaceHolderFile(name, new FileInputStream(file), resolver);
-                configurationFiles.add(configurationFile);
-                continue;
-            }
-
-            if ("control".equals(name)) {
-                packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
-
-                if (packageDescriptor.get("Date") == null) {
-                    SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
-                    // FIXME Is this field allowed in package descriptors ?
-                    packageDescriptor.set("Date", fmt.format(new Date()));
-                }
-
-                if (packageDescriptor.get("Distribution") == null) {
-                    packageDescriptor.set("Distribution", "unknown");
-                }
-
-                if (packageDescriptor.get("Urgency") == null) {
-                    packageDescriptor.set("Urgency", "low");
-                }
-
-                final String debFullName = System.getenv("DEBFULLNAME");
-                final String debEmail = System.getenv("DEBEMAIL");
-
-                if (debFullName != null && debEmail != null) {
-                    packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
-                    console.println("Using maintainer from the environment variables.");
-                }
-
-                continue;
-            }
-
-            final TarEntry entry = new TarEntry(file);
-            entry.setName("./" + name);
-            entry.setNames("root", "root");
-            entry.setMode(PermMapper.toMode("755"));
-
-            final InputStream inputStream = new FileInputStream(file);
-
-            outputStream.putNextEntry(entry);
-
-            Utils.copy(inputStream, outputStream);
-
-            outputStream.closeEntry();
-
-            inputStream.close();
-
         }
 
         if (packageDescriptor == null) {
@@ -368,12 +323,12 @@ public class Processor {
         packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
 
         for (PropertyPlaceHolderFile configurationFile : configurationFiles) {
-            addEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
+            addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
         }
 
-        addEntry("control", packageDescriptor.toString(), outputStream);
+        addControlEntry("control", packageDescriptor.toString(), outputStream);
 
-        addEntry("md5sums", pChecksums.toString(), outputStream);
+        addControlEntry("md5sums", pChecksums.toString(), outputStream);
 
         outputStream.close();
 
@@ -558,7 +513,40 @@ public class Processor {
         return dataSize.count;
     }
 
-    private static void addEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
+    private void addConfigurationFile( List<PropertyPlaceHolderFile> configurationFiles, final File file ) throws IOException, ParseException, FileNotFoundException {
+        PropertyPlaceHolderFile configurationFile = new PropertyPlaceHolderFile(file.getName(), new FileInputStream(file), resolver);
+        configurationFiles.add(configurationFile);
+    }
+
+    private PackageDescriptor addPackageDescriptorEntry( final File file ) throws IOException, ParseException, FileNotFoundException {
+        PackageDescriptor packageDescriptor;
+        packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
+
+        if (packageDescriptor.get("Date") == null) {
+            SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
+            // FIXME Is this field allowed in package descriptors ?
+            packageDescriptor.set("Date", fmt.format(new Date()));
+        }
+
+        if (packageDescriptor.get("Distribution") == null) {
+            packageDescriptor.set("Distribution", "unknown");
+        }
+
+        if (packageDescriptor.get("Urgency") == null) {
+            packageDescriptor.set("Urgency", "low");
+        }
+
+        final String debFullName = System.getenv("DEBFULLNAME");
+        final String debEmail = System.getenv("DEBEMAIL");
+
+        if (debFullName != null && debEmail != null) {
+            packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
+            console.println("Using maintainer from the environment variables.");
+        }
+        return packageDescriptor;
+    }
+    
+    private void addControlEntry( final String pName, final String pContent, final TarOutputStream pOutput ) throws IOException {
         final byte[] data = pContent.getBytes("UTF-8");
         final TarEntry entry = new TarEntry("./" + pName);
         entry.setSize(data.length);
@@ -569,5 +557,18 @@ public class Processor {
         pOutput.write(data);
         pOutput.closeEntry();
     }
+    
+    private void addControlEntry( final File pFile, final TarOutputStream pOutput ) throws IOException {
+        final TarEntry entry = new TarEntry(pFile);
+        entry.setName("./" + pFile.getName());
+        entry.setNames("root", "root");
+        entry.setMode(PermMapper.toMode("755"));
 
+        final InputStream inputStream = new FileInputStream(pFile);
+        pOutput.putNextEntry(entry);
+        Utils.copy(inputStream, pOutput);
+        pOutput.closeEntry();
+        inputStream.close();
+    }
+    
 }
