@@ -30,6 +30,7 @@ import org.vafer.jdeb.utils.VariableResolver;
 /**
  * Build the control section of the debian package.
  *
+ * @author Torsten Curdt <tcurdt@vafer.org>
  * @author Elliot West <elliot@last.fm>
  */
 public class ControlBuilder {
@@ -63,7 +64,9 @@ public class ControlBuilder {
      * @throws ParseException
      * @throws InvalidDescriptorException 
      */
-    public void build( final File[] pControlFiles, final BigInteger pDataSize, final StringBuilder pChecksums, final File pOutput ) throws IOException, ParseException, InvalidDescriptorException {
+    public void build( final File[] pControlFiles, final BigInteger pDataSize, final String pChecksums, final File pOutput ) throws IOException, ParseException, InvalidDescriptorException {
+        console.println("Building control");
+        
         final TarOutputStream outputStream = new TarOutputStream(new GZIPOutputStream(new FileOutputStream(pOutput)));
         outputStream.setLongFileMode(TarOutputStream.LONGFILE_GNU);
 
