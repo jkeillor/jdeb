@@ -15,6 +15,8 @@
  */
 package org.vafer.jdeb.maven;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
@@ -234,11 +236,14 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
 
         try {
-
             final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
+            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
+            if (!controlDirFile.exists()) {
+                getLog().info(format("%s does not exist. Review the configuration or consider disabling the plugin.", controlDirFile));
+                return;
+            }
 
             final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
-            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
             final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));
             final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
             final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));
