@@ -40,7 +40,7 @@ public class ControlBuilder {
     private final VariableResolver resolver;
     private final Console console;
     private PackageDescriptor packageDescriptor;
-    private List<PropertyPlaceHolderFile> configurationFiles = new ArrayList<PropertyPlaceHolderFile>();
+    private List<FilteredConfigurationFile> configurationFiles = new ArrayList<FilteredConfigurationFile>();
     
     public ControlBuilder(VariableResolver resolver, Console console) {
         this.resolver = resolver;
@@ -81,7 +81,7 @@ public class ControlBuilder {
         }
         packageDescriptor.set("Installed-Size", pDataSize.divide(BigInteger.valueOf(1024)).toString());
 
-        for (PropertyPlaceHolderFile configurationFile : configurationFiles) {
+        for (FilteredConfigurationFile configurationFile : configurationFiles) {
             addControlEntry(configurationFile.getName(), configurationFile.toString(), outputStream);
         }
         addControlEntry("control", packageDescriptor.toString(), outputStream);
@@ -100,8 +100,8 @@ public class ControlBuilder {
     }
     
     
-    private void addConfigurationFile( List<PropertyPlaceHolderFile> configurationFiles, final File file ) throws IOException, ParseException, FileNotFoundException {
-        PropertyPlaceHolderFile configurationFile = new PropertyPlaceHolderFile(file.getName(), new FileInputStream(file), resolver);
+    private void addConfigurationFile( List<FilteredConfigurationFile> configurationFiles, final File file ) throws IOException, ParseException, FileNotFoundException {
+        FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
         configurationFiles.add(configurationFile);
     }
 

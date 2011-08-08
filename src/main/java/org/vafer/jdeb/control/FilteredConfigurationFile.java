@@ -11,14 +11,14 @@ import java.util.List;
 import org.vafer.jdeb.utils.Utils;
 import org.vafer.jdeb.utils.VariableResolver;
 
-public class PropertyPlaceHolderFile {
+public class FilteredConfigurationFile {
 
     private static String openToken = "[[";
     private static String closeToken = "]]";
     private List<String> lines = new ArrayList<String>();
     private String name;
 
-    public PropertyPlaceHolderFile(String name, InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
+    public FilteredConfigurationFile(String name, InputStream pInputStream, VariableResolver pResolver) throws IOException, ParseException {
         this.name = name;
         parse(pInputStream, pResolver);
     }

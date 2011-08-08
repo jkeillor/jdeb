@@ -15,12 +15,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vafer.jdeb.utils.VariableResolver;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PropertyPlaceHolderFileTestCase {
+public class FilteredConfigurationFileTestCase {
 
     @Mock
     private VariableResolver mockVariableResolver;
     
-    private PropertyPlaceHolderFile placeHolder;
+    private FilteredConfigurationFile placeHolder;
     
     @Test
     public void findReplace() throws Exception {
@@ -30,7 +30,7 @@ public class PropertyPlaceHolderFileTestCase {
         
         InputStream inputStream = new ReaderInputStream(new StringReader("#!/bin/sh\ncat [[artifactId]][[myProperty1]] \necho '[[myProperty2]]'\n"));
 
-        placeHolder = new PropertyPlaceHolderFile("", inputStream, mockVariableResolver);
+        placeHolder = new FilteredConfigurationFile("", inputStream, mockVariableResolver);
         
         String actual = placeHolder.toString();
         assertThat(actual, is("#!/bin/sh\ncat jdebcustom1 \necho 'custom2'\n"));
@@ -39,7 +39,7 @@ public class PropertyPlaceHolderFileTestCase {
     @Test
     public void name() throws Exception {
         InputStream inputStream = new ReaderInputStream(new StringReader(""));
-        placeHolder = new PropertyPlaceHolderFile("myName", inputStream, mockVariableResolver);
+        placeHolder = new FilteredConfigurationFile("myName", inputStream, mockVariableResolver);
         assertThat(placeHolder.getName(), is("myName"));
     }
     
