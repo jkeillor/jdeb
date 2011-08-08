@@ -37,6 +37,10 @@ public class ControlBuilder {
     private static final Set<String> CONFIGURATION_FILENAMES
         = new HashSet<String>(Arrays.asList(new String[] { "conffiles", "preinst", "postinst", "prerm", "postrm" } ));
 
+    // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
+    private static final  SimpleDateFormat DESCRIPTOR_DATE_FORMAT
+        = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); 
+    
     private final VariableResolver resolver;
     private final Console console;
     private PackageDescriptor packageDescriptor;
@@ -93,12 +97,10 @@ public class ControlBuilder {
             throw new InvalidDescriptorException(packageDescriptor);
         }
     }
-    
 
     public PackageDescriptor getPackageDescriptor() {
         return packageDescriptor; 
     }
-    
     
     private void addConfigurationFile( List<FilteredConfigurationFile> configurationFiles, final File file ) throws IOException, ParseException, FileNotFoundException {
         FilteredConfigurationFile configurationFile = new FilteredConfigurationFile(file.getName(), new FileInputStream(file), resolver);
@@ -109,25 +111,24 @@ public class ControlBuilder {
         packageDescriptor = new PackageDescriptor(new FileInputStream(file), resolver);
 
         if (packageDescriptor.get("Date") == null) {
-            SimpleDateFormat fmt = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH); // Mon, 26 Mar 2007 11:44:04 +0200 (RFC 2822)
             // FIXME Is this field allowed in package descriptors ?
-            packageDescriptor.set("Date", fmt.format(new Date()));
+            packageDescriptor.set("Date", DESCRIPTOR_DATE_FORMAT.format(new Date()));
         }
 
-        if (packageDescriptor.get("Distribution") == null) {
-            packageDescriptor.set("Distribution", "unknown");
-        }
-
-        if (packageDescriptor.get("Urgency") == null) {
-            packageDescriptor.set("Urgency", "low");
-        }
+        setFallbackValue("Distribution", "unknown");
+        setFallbackValue("Urgency", "low");
 
         final String debFullName = System.getenv("DEBFULLNAME");
         final String debEmail = System.getenv("DEBEMAIL");
-
         if (debFullName != null && debEmail != null) {
             packageDescriptor.set("Maintainer", debFullName + " <" + debEmail + ">");
             console.println("Using maintainer from the environment variables.");
+        }
+    }
+
+    private void setFallbackValue(String pKey, String pDefaultValue) {
+        if (packageDescriptor.get(pKey) == null) {
+            packageDescriptor.set(pKey, pDefaultValue);
         }
     }
     
