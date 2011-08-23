@@ -104,21 +104,23 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    ||   Element    || Description                                                                 || Required                                  ||
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src           | The directory, tarball, or file to include in the package                    | Yes for all but type 'literal'              |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type          | Type of the data source. (archive|directory|file|literal)                    | No; but will be Yes in the future           |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | includes      | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | excludes      | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | mapper        | The files to exclude from the directory or tarball                           | No                                          |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | paths/(path..)| One or more string literal paths that will created in the package            | No; Yes for type 'literal'                  |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    ||   Element       || Description                                                                 || Required                                  ||
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | src              | The directory, tarball, or file to include in the package                    | Yes for all but type 'literal'              |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | type             | Type of the data source. (archive|directory|file|literal)                    | No; but will be Yes in the future           |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | failOnMissingSrc | Fail if src file/folder is missing (true|false)                              | No                                          |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | mapper           | The files to exclude from the directory or tarball                           | No                                          |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type 'literal'                  |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
