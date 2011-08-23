@@ -39,116 +39,114 @@ import org.vafer.jdeb.mapping.Mapper;
 
 /**
  * Providing data from an archive keeping permissions and ownerships.
- * 
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerArchive extends AbstractDataProducer implements DataProducer {
 
-  private final File archive;
+    private final File archive;
 
-  public DataProducerArchive(final File pArchive, final String[] pIncludes, final String[] pExcludes,
-      final Mapper[] pMappers) {
-    super(pIncludes, pExcludes, pMappers);
-    archive = pArchive;
-  }
-
-  public void produce(final DataConsumer pReceiver) throws IOException {
-
-    InputStream is = new BufferedInputStream(new FileInputStream(archive));
-
-    CompressorInputStream compressorInputStream = null;
-
-    try {
-      compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
-    } catch (CompressorException e) {
-      // not compressed or unknown compressor
+    public DataProducerArchive( final File pArchive, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+        super(pIncludes, pExcludes, pMappers);
+        archive = pArchive;
     }
 
-    if (compressorInputStream != null) {
-      is = new BufferedInputStream(compressorInputStream);
+    public void produce( final DataConsumer pReceiver ) throws IOException {
+
+        InputStream is = new BufferedInputStream(new FileInputStream(archive));
+
+        CompressorInputStream compressorInputStream = null;
+
+        try {
+            compressorInputStream = new CompressorStreamFactory().createCompressorInputStream(is);
+        } catch(CompressorException e) {
+            // not compressed or unknown compressor
+        }
+
+        if (compressorInputStream != null) {
+            is = new BufferedInputStream(compressorInputStream);
+        }
+
+        ArchiveInputStream archiveInputStream = null;
+
+        try {
+            archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
+        } catch(ArchiveException e) {
+            throw new IOException("Unsupported archive format : " + archive, e);
+        }
+
+        EntryConverter converter = null;
+
+        if (archiveInputStream instanceof TarArchiveInputStream) {
+
+            converter = new EntryConverter() {
+                public TarEntry convert(ArchiveEntry entry) {
+                    TarArchiveEntry src = (TarArchiveEntry)entry;
+                    TarEntry dst = new TarEntry(src.getName());
+
+                    dst.setSize(src.getSize());
+                    dst.setGroupName(src.getGroupName());
+                    dst.setGroupId(src.getGroupId());
+                    dst.setUserId(src.getUserId());
+                    dst.setMode(src.getMode());
+                    dst.setModTime(src.getModTime());
+
+                    return dst;
+                }
+            };
+
+        } else if (archiveInputStream instanceof ZipArchiveInputStream) {
+
+            converter = new EntryConverter() {
+                public TarEntry convert(ArchiveEntry entry) {
+                    ZipArchiveEntry src = (ZipArchiveEntry)entry;
+                    TarEntry dst = new TarEntry(src.getName());
+
+                    dst.setSize(src.getSize());
+                    dst.setMode(src.getUnixMode());
+                    dst.setModTime(src.getTime());
+
+                    return dst;
+                }
+            };
+
+        } else {
+            throw new IOException("Unsupported archive format : " + archive);
+        }
+
+
+        try {
+            while(true) {
+
+                ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
+
+                if (archiveEntry == null) {
+                    break;
+                }
+
+                if (!isIncluded(archiveEntry.getName())) {
+                    continue;
+                }
+
+                TarEntry entry = converter.convert(archiveEntry);
+
+                entry = map(entry);
+
+                if (entry.isDirectory()) {
+                    pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+                    continue;
+                }
+                pReceiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+            }
+
+        } finally {
+            if (archiveInputStream != null) {
+                archiveInputStream.close();
+            }
+        }
     }
 
-    ArchiveInputStream archiveInputStream = null;
-
-    try {
-      archiveInputStream = new ArchiveStreamFactory().createArchiveInputStream(is);
-    } catch (ArchiveException e) {
-      throw new IOException("Unsupported archive format : " + archive, e);
+    private interface EntryConverter {
+        public TarEntry convert(ArchiveEntry entry);
     }
-
-    EntryConverter converter = null;
-
-    if (archiveInputStream instanceof TarArchiveInputStream) {
-
-      converter = new EntryConverter() {
-        public TarEntry convert(ArchiveEntry entry) {
-          TarArchiveEntry src = (TarArchiveEntry) entry;
-          TarEntry dst = new TarEntry(src.getName());
-
-          dst.setSize(src.getSize());
-          dst.setGroupName(src.getGroupName());
-          dst.setGroupId(src.getGroupId());
-          dst.setUserId(src.getUserId());
-          dst.setMode(src.getMode());
-          dst.setModTime(src.getModTime());
-
-          return dst;
-        }
-      };
-
-    } else if (archiveInputStream instanceof ZipArchiveInputStream) {
-
-      converter = new EntryConverter() {
-        public TarEntry convert(ArchiveEntry entry) {
-          ZipArchiveEntry src = (ZipArchiveEntry) entry;
-          TarEntry dst = new TarEntry(src.getName());
-
-          dst.setSize(src.getSize());
-          dst.setMode(src.getUnixMode());
-          dst.setModTime(src.getTime());
-
-          return dst;
-        }
-      };
-
-    } else {
-      throw new IOException("Unsupported archive format : " + archive);
-    }
-
-    try {
-      while (true) {
-
-        ArchiveEntry archiveEntry = archiveInputStream.getNextEntry();
-
-        if (archiveEntry == null) {
-          break;
-        }
-
-        if (!isIncluded(archiveEntry.getName())) {
-          continue;
-        }
-
-        TarEntry entry = converter.convert(archiveEntry);
-
-        entry = map(entry);
-
-        if (entry.isDirectory()) {
-          pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(),
-              entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-          continue;
-        }
-        pReceiver.onEachFile(archiveInputStream, entry.getName(), entry.getLinkName(), entry.getUserName(),
-            entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-      }
-
-    } finally {
-      if (archiveInputStream != null) {
-        archiveInputStream.close();
-      }
-    }
-  }
-
-  private interface EntryConverter {
-    public TarEntry convert(ArchiveEntry entry);
-  }
 }

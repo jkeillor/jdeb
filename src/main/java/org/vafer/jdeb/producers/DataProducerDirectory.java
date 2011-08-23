@@ -28,107 +28,105 @@ import org.vafer.jdeb.mapping.Mapper;
 import org.vafer.jdeb.utils.Utils;
 
 /**
- * DataProducer iterating over a directory. For cross-platform permissions and ownerships you probably want to use a
- * Mapper, too.
- * 
+ * DataProducer iterating over a directory.
+ * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerDirectory extends AbstractDataProducer implements DataProducer {
 
-  private final DirectoryScanner scanner = new DirectoryScanner();
+    private final DirectoryScanner scanner = new DirectoryScanner();
 
-  public DataProducerDirectory(final File pDir, final String[] pIncludes, final String[] pExcludes,
-      final Mapper[] pMappers) {
-    super(pIncludes, pExcludes, pMappers);
-    scanner.setBasedir(pDir);
-    scanner.setIncludes(pIncludes);
-    scanner.setExcludes(pExcludes);
-    scanner.setCaseSensitive(true);
-    scanner.setFollowSymlinks(true);
-  }
-
-  public void produce(final DataConsumer pReceiver) throws IOException {
-
-    scanner.scan();
-
-    final File baseDir = scanner.getBasedir();
-
-    final String[] dirs = scanner.getIncludedDirectories();
-    for (String dir : dirs) {
-      final File file = new File(baseDir, dir);
-      String dirname = getFilename(baseDir, file);
-
-      if ("".equals(dirname)) {
-        continue;
-      }
-
-      if (!isIncluded(dirname)) {
-        continue;
-      }
-
-      if ('/' != File.separatorChar) {
-        dirname = dirname.replace(File.separatorChar, '/');
-      }
-
-      if (!dirname.endsWith("/")) {
-        dirname += "/";
-      }
-
-      TarEntry entry = new TarEntry(dirname);
-      entry.setUserId(0);
-      entry.setUserName("root");
-      entry.setGroupId(0);
-      entry.setGroupName("root");
-      entry.setMode(TarEntry.DEFAULT_DIR_MODE);
-
-      entry = map(entry);
-
-      entry.setSize(0);
-
-      pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(),
-          entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+    public DataProducerDirectory( final File pDir, final String[] pIncludes, final String[] pExcludes, final Mapper[] pMappers ) {
+        super(pIncludes, pExcludes, pMappers);
+        scanner.setBasedir(pDir);
+        scanner.setIncludes(pIncludes);
+        scanner.setExcludes(pExcludes);
+        scanner.setCaseSensitive(true);
+        scanner.setFollowSymlinks(true);
     }
 
-    final String[] files = scanner.getIncludedFiles();
+    public void produce( final DataConsumer pReceiver ) throws IOException {
 
-    for (String file2 : files) {
-      final File file = new File(baseDir, file2);
-      String filename = getFilename(baseDir, file);
+        scanner.scan();
 
-      if (!isIncluded(filename)) {
-        continue;
-      }
+        final File baseDir = scanner.getBasedir();
 
-      if ('/' != File.separatorChar) {
-        filename = filename.replace(File.separatorChar, '/');
-      }
+        final String[] dirs = scanner.getIncludedDirectories();
+        for (int i = 0; i < dirs.length; i++) {
+            final File file = new File(baseDir, dirs[i]);
+            String dirname = getFilename(baseDir, file);
 
-      TarEntry entry = new TarEntry(filename);
-      entry.setUserId(0);
-      entry.setUserName("root");
-      entry.setGroupId(0);
-      entry.setGroupName("root");
-      entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+            if ("".equals(dirname)) {
+                continue;
+            }
 
-      entry = map(entry);
+            if (!isIncluded(dirname)) {
+                continue;
+            }
 
-      entry.setSize(file.length());
+            if ('/' != File.separatorChar) {
+                dirname = dirname.replace(File.separatorChar, '/');
+            }
 
-      final InputStream inputStream = new FileInputStream(file);
-      try {
-        pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(),
-            entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-      } finally {
-        inputStream.close();
-      }
+            if (!dirname.endsWith("/")) {
+                dirname += "/";
+            }
+
+            TarEntry entry = new TarEntry(dirname);
+            entry.setUserId(0);
+            entry.setUserName("root");
+            entry.setGroupId(0);
+            entry.setGroupName("root");
+            entry.setMode(TarEntry.DEFAULT_DIR_MODE);
+
+            entry = map(entry);
+
+            entry.setSize(0);
+
+            pReceiver.onEachDir(entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+        }
+
+
+        final String[] files = scanner.getIncludedFiles();
+
+        for (int i = 0; i < files.length; i++) {
+            final File file = new File(baseDir, files[i]);
+            String filename = getFilename(baseDir, file);
+
+            if (!isIncluded(filename)) {
+                continue;
+            }
+
+            if ('/' != File.separatorChar) {
+                filename = filename.replace(File.separatorChar, '/');
+            }
+
+            TarEntry entry = new TarEntry(filename);
+            entry.setUserId(0);
+            entry.setUserName("root");
+            entry.setGroupId(0);
+            entry.setGroupName("root");
+            entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+
+            entry = map(entry);
+
+            entry.setSize(file.length());
+
+            final InputStream inputStream = new FileInputStream(file);
+            try {
+                pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+            } finally {
+                inputStream.close();
+            }
+        }
     }
-  }
 
-  private String getFilename(File root, File file) {
+    private String getFilename( File root, File file ) {
 
-    final String relativeFilename = file.getAbsolutePath().substring(root.getAbsolutePath().length());
+        final String relativeFilename = file.getAbsolutePath().substring(root.getAbsolutePath().length());
 
-    return Utils.stripLeadingSlash(relativeFilename);
-  }
+        return Utils.stripLeadingSlash(relativeFilename);
+    }
 
 }

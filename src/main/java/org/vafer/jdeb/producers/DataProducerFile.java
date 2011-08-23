@@ -26,41 +26,40 @@ import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.mapping.Mapper;
 
 /**
- * DataProducer representing a single file For cross-platform permissions and ownerships you probably want to use a
- * Mapper, too.
- * 
+ * DataProducer representing a single file
+ * For cross-platform permissions and ownerships you probably want to use a Mapper, too.
+ *
  * @author Torsten Curdt <tcurdt@vafer.org>
  */
 public final class DataProducerFile extends AbstractDataProducer implements DataProducer {
 
-  private final File file;
+    private final File file;
 
-  public DataProducerFile(final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
-    super(pIncludes, pExcludes, pMapper);
-    file = pFile;
-  }
-
-  public void produce(final DataConsumer pReceiver) throws IOException {
-
-    TarEntry entry = new TarEntry(file.getName());
-    entry.setUserId(0);
-    entry.setUserName("root");
-    entry.setGroupId(0);
-    entry.setGroupName("root");
-    entry.setMode(TarEntry.DEFAULT_FILE_MODE);
-
-    entry = map(entry);
-
-    entry.setSize(file.length());
-
-    final InputStream inputStream = new FileInputStream(file);
-    try {
-      pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(),
-          entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
-    } finally {
-      inputStream.close();
+    public DataProducerFile(final File pFile, String[] pIncludes, String[] pExcludes, Mapper[] pMapper) {
+        super(pIncludes, pExcludes, pMapper);
+        file = pFile;
     }
 
-  }
+    public void produce( final DataConsumer pReceiver ) throws IOException {
+
+        TarEntry entry = new TarEntry(file.getName());
+        entry.setUserId(0);
+        entry.setUserName("root");
+        entry.setGroupId(0);
+        entry.setGroupName("root");
+        entry.setMode(TarEntry.DEFAULT_FILE_MODE);
+
+        entry = map(entry);
+
+        entry.setSize(file.length());
+
+        final InputStream inputStream = new FileInputStream(file);
+        try {
+            pReceiver.onEachFile(inputStream, entry.getName(), entry.getLinkName(), entry.getUserName(), entry.getUserId(), entry.getGroupName(), entry.getGroupId(), entry.getMode(), entry.getSize());
+        } finally {
+            inputStream.close();
+        }
+
+    }
 
 }

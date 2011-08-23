@@ -33,9 +33,9 @@ public abstract class AbstractDataProducer implements DataProducer {
 
 
     public AbstractDataProducer( final String[] pIncludes, final String[] pExcludes, final Mapper[] pMapper ) {
-        excludes = pExcludes != null ? pExcludes : new String[0];
-        includes = pIncludes != null ? pIncludes : new String[] { "**" };
-        mappers = pMapper != null ? pMapper : new Mapper[0];
+        excludes = (pExcludes != null) ? pExcludes : new String[0];
+        includes = (pIncludes != null) ? pIncludes : new String[] { "**" };
+        mappers = (pMapper != null) ? pMapper : new Mapper[0];
     }
 
     public boolean isIncluded( final String pName ) {
