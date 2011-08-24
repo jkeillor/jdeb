@@ -43,6 +43,8 @@ public final class Data extends PatternSet implements DataProducer {
     private File src;
 
     private String type;
+    
+    private String destinationName;
 
     public void setSrc( final File pSrc ) {
         src = pSrc;
@@ -52,6 +54,10 @@ public final class Data extends PatternSet implements DataProducer {
         type = pType;
     }
 
+    public void setDestinationName(String pDestinationName) {
+      destinationName = pDestinationName;
+    }
+    
     public void addMapper( final Mapper pMapper ) {
         mapperWrapper.add(pMapper);
     }
@@ -71,6 +77,7 @@ public final class Data extends PatternSet implements DataProducer {
         if ("file".equalsIgnoreCase(type)) {
             new DataProducerFile(
                     src,
+                    destinationName,
                     getIncludePatterns(getProject()),
                     getExcludePatterns(getProject()),
                     mappers

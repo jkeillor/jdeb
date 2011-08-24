@@ -48,6 +48,16 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
+    private String destinationName;
+
+    /**
+     * @parameter expression="${destinationName}"
+     * @required
+     */
+    public void setDest(String destinationName) {
+        this.destinationName = destinationName;
+    }
+    
     private String type;
 
     /**
@@ -124,7 +134,7 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerFile(src, destinationName, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
@@ -138,7 +148,7 @@ public final class Data implements DataProducer {
             return;
         }
 
-        if ("literal".equalsIgnoreCase(type)) {
+        if ("template".equalsIgnoreCase(type)) {
             new DataProducerLiteralPaths(paths, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }

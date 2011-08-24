@@ -63,7 +63,7 @@ is present, allowing a conffiles configuration of the form:
 
 The jdeb maven plugin also supports a variety of configuration options. These
 configuration options provide the same features available in the jdeb ant
-task. To configure the jdeb maven plugin, populate the jdeb configuraiton
+task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
     *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
@@ -109,7 +109,9 @@ following options:
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | src              | The directory, tarball, or file to include in the package                    | Yes for all but type 'literal'              |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type             | Type of the data source. (archive|directory|file|literal)                    | No; but will be Yes in the future           |
+    | type             | Type of the data source. (archive|directory|file|template)                   | No; but will be Yes in the future           |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | destinationName  | New filename at destination (type must be 'file')                            | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
     | failOnMissingSrc | Fail if src file/folder is missing (true|false)                              | No                                          |
     *------------------+------------------------------------------------------------------------------+---------------------------------------------+
@@ -197,9 +199,9 @@ include a directory, a tarball, and a file in your deb package:
                                     <src>${project.basedir}/README.txt</src>
                                     <type>file</type>
                                 </data>
-                                <!-- Literal example -->
+                                <!-- Template example -->
                                 <data>
-                                    <type>literal</type>
+                                    <type>template</type>
                                     <paths>
                                         <path>/etc/${artifactId}</path>
                                         <path>/var/lib/${artifactId}</path>
