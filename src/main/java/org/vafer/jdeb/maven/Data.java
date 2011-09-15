@@ -19,14 +19,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.vafer.jdeb.DataConsumer;
 import org.vafer.jdeb.DataProducer;
 import org.vafer.jdeb.producers.DataProducerArchive;
 import org.vafer.jdeb.producers.DataProducerDirectory;
 import org.vafer.jdeb.producers.DataProducerFile;
+import org.vafer.jdeb.producers.DataProducerLiteralPaths;
 
 /**
  * Maven "data" elment acting as a factory for DataProducers. So far Archive and
@@ -47,7 +48,16 @@ public final class Data implements DataProducer {
         this.src = src;
     }
 
+    private String destinationName;
 
+    /**
+     * @parameter expression="${destinationName}"
+     * @required
+     */
+    public void setDest(String destinationName) {
+        this.destinationName = destinationName;
+    }
+    
     private String type;
 
     /**
@@ -57,6 +67,14 @@ public final class Data implements DataProducer {
         this.type = type;
     }
 
+    private boolean failOnMissingSrc = true;
+
+    /**
+     * @parameter expression="${failOnMissingSrc}"
+     */
+    public void setFailOnMissingSrc(boolean failOnMissingSrc) {
+        this.failOnMissingSrc = failOnMissingSrc;
+    }
 
     /**
      * @parameter expression="${includes}" alias="includes"
@@ -80,22 +98,34 @@ public final class Data implements DataProducer {
      */
     private Mapper mapper;
 
+    /**
+     * @parameter expression="${paths}"
+     */
+    private String[] paths;
+
     public String[] splitPatterns(String patterns) {
         String[] result = null;
         if (patterns != null && patterns.length() > 0) {
-            List tokens = new ArrayList();
+            List<String> tokens = new ArrayList<String>();
             StringTokenizer tok = new StringTokenizer(patterns, ", ", false);
             while (tok.hasMoreTokens()) {
                 tokens.add(tok.nextToken());
             }
-            result = (String[]) tokens.toArray(new String[tokens.size()]);
+            result = tokens.toArray(new String[tokens.size()]);
         }
         return result;
     }
 
     public void produce(final DataConsumer pReceiver) throws IOException {
-        if (!src.exists()) {
-            throw new FileNotFoundException("Data source not found : " + src);
+        if (src != null && !src.exists()) {
+            if (failOnMissingSrc) {
+                throw new FileNotFoundException("Data source not found : " + src);
+            } else {
+                return;
+            }
+        }
+        if (src == null && (paths == null || paths.length == 0)) {
+            throw new RuntimeException("src or paths not set");
         }
 
         org.vafer.jdeb.mapping.Mapper[] mappers = null;
@@ -104,7 +134,7 @@ public final class Data implements DataProducer {
         }
 
         if ("file".equalsIgnoreCase(type)) {
-            new DataProducerFile(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            new DataProducerFile(src, destinationName, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 
@@ -115,6 +145,11 @@ public final class Data implements DataProducer {
 
         if ("directory".equalsIgnoreCase(type)) {
             new DataProducerDirectory(src, includePatterns, excludePatterns, mappers).produce(pReceiver);
+            return;
+        }
+
+        if ("template".equalsIgnoreCase(type)) {
+            new DataProducerLiteralPaths(paths, includePatterns, excludePatterns, mappers).produce(pReceiver);
             return;
         }
 

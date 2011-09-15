@@ -186,9 +186,9 @@ public final class DebAntTaskTestCase extends TestCase {
                 tar.close();
             } else {
                 // skip to the next entry
-                long skip = entry.getLength(); 
+                long skip = entry.getLength();
                 while(skip > 0) {
-                    long skipped = in.skip(skip); 
+                    long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
                     }
@@ -226,14 +226,14 @@ public final class DebAntTaskTestCase extends TestCase {
                 assertEquals("header 1", (byte) 'Z', in.read());
 
                 TarInputStream tar = new TarInputStream(new CBZip2InputStream(in));
-                while ((tar.getNextEntry()) != null);
+                while (tar.getNextEntry() != null);
                 tar.close();
                 break;
             } else {
                 // skip to the next entry
-                long skip = entry.getLength(); 
+                long skip = entry.getLength();
                 while(skip > 0) {
-                    long skipped = in.skip(skip); 
+                    long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
                     }
@@ -261,13 +261,13 @@ public final class DebAntTaskTestCase extends TestCase {
                 found = true;
 
                 TarInputStream tar = new TarInputStream(new NonClosingInputStream(in));
-                while ((tar.getNextEntry()) != null);
+                while (tar.getNextEntry() != null);
                 tar.close();
             } else {
                 // skip to the next entry
-                long skip = entry.getLength(); 
+                long skip = entry.getLength();
                 while(skip > 0) {
-                    long skipped = in.skip(skip); 
+                    long skipped = in.skip(skip);
                     if (skipped == -1) {
                         throw new IOException("Failed to skip");
                     }

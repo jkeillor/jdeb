@@ -73,7 +73,7 @@ public class DebAntTask extends MatchingTask {
     /** Trigger the verbose mode detailing all operations */
     private boolean verbose;
 
-    private Collection dataProducers = new ArrayList();
+    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
 
 
     public void setDestfile( File deb ) {
@@ -85,15 +85,15 @@ public class DebAntTask extends MatchingTask {
     }
 
     public void setChangesIn( File changes ) {
-        this.changesIn = changes;
+        changesIn = changes;
     }
 
     public void setChangesOut( File changes ) {
-        this.changesOut = changes;
+        changesOut = changes;
     }
 
     public void setChangesSave( File changes ) {
-        this.changesSave = changes;
+        changesSave = changes;
     }
 
     public void setKeyring( File keyring ) {
@@ -197,7 +197,7 @@ public class DebAntTask extends MatchingTask {
 
             log("Creating debian package: " + deb);
 
-            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression);
+            packageDescriptor = processor.createDeb(controlFiles, data, deb, compression );
 
         } catch (Exception e) {
             throw new BuildException("Failed to create debian package " + deb, e);
@@ -215,7 +215,7 @@ public class DebAntTask extends MatchingTask {
             // for now only support reading the changes form a textfile provider
             changesProvider = new TextfileChangesProvider(new FileInputStream(changesIn), packageDescriptor);
 
-            processor.createChanges(packageDescriptor, changesProvider, (keyring!=null)?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
+            processor.createChanges(packageDescriptor, changesProvider, keyring!=null?new FileInputStream(keyring):null, key, passphrase, new FileOutputStream(changesOut));
 
         } catch (Exception e) {
             throw new BuildException("Failed to create debian changes file " + changesOut, e);

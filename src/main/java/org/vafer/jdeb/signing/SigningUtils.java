@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.BCPGOutputStream;
+import org.bouncycastle.bcpg.HashAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
@@ -50,14 +51,16 @@ public final class SigningUtils {
 
         final PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(pInput));
 
-        final Iterator rIt = pgpSec.getKeyRings();
+        @SuppressWarnings("unchecked")
+        final Iterator<PGPSecretKeyRing> rIt = pgpSec.getKeyRings();
 
         while (rIt.hasNext()) {
-            final PGPSecretKeyRing kRing = (PGPSecretKeyRing) rIt.next();
-            final Iterator kIt = kRing.getSecretKeys();
+            final PGPSecretKeyRing kRing = rIt.next();
+            @SuppressWarnings("unchecked")
+            final Iterator<PGPSecretKey> kIt = kRing.getSecretKeys();
 
             while (kIt.hasNext()) {
-                final PGPSecretKey k = (PGPSecretKey) kIt.next();
+                final PGPSecretKey k = kIt.next();
 
                 if (k.isSigningKey() && Long.toHexString(k.getKeyID() & 0xFFFFFFFFL).equals(pKey.toLowerCase())) {
                     return k;
@@ -89,7 +92,7 @@ public final class SigningUtils {
         final PGPSecretKey secretKey = getSecretKey(pKeyring, pKey);
         final PGPPrivateKey privateKey = secretKey.extractPrivateKey(pPassphrase.toCharArray(), "BC");
 
-        final int digest = PGPUtil.SHA1;
+        final int digest = HashAlgorithmTags.SHA1;
 
         final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(secretKey.getPublicKey().getAlgorithm(), digest, "BC");
         signatureGenerator.initSign(PGPSignature.CANONICAL_TEXT_DOCUMENT, privateKey);

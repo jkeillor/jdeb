@@ -27,14 +27,14 @@ import java.util.Map;
 
 public final class MapVariableResolver implements VariableResolver {
 
-    private final Map map;
+    private final Map<String, String> map;
 
-    public MapVariableResolver( final Map pMap ) {
+    public MapVariableResolver( final Map<String, String> pMap ) {
         map = pMap;
     }
 
     public String get( final String pKey ) {
-        return (String) map.get(pKey);
+        return map.get(pKey);
     }
 
 }

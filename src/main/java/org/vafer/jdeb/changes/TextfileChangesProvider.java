@@ -60,14 +60,14 @@ public final class TextfileChangesProvider implements ChangesProvider {
         String distribution = pDescriptor.get("Distribution");
         String urgency = pDescriptor.get("Urgency");
         String changedBy = pDescriptor.get("Maintainer");
-        final Collection changesColl = new ArrayList();
-        final Collection changeSetColl = new ArrayList();
+        final Collection<String> changesColl = new ArrayList<String>();
+        final Collection<ChangeSet> changeSetColl = new ArrayList<ChangeSet>();
 
 
         while(true) {
             final String line = reader.readLine();
             if (line == null) {
-                final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);
+                final String[] changes = changesColl.toArray(new String[changesColl.size()]);
                 final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
                 changeSetColl.add(changeSet);
                 break;
@@ -76,7 +76,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
             if (line.startsWith("release ")) {
 
                 if (changesColl.size() > 0) {
-                    final String[] changes = (String[]) changesColl.toArray(new String[changesColl.size()]);
+                    final String[] changes = changesColl.toArray(new String[changesColl.size()]);
                     final ChangeSet changeSet = new ChangeSet(packageName, version, date, distribution, urgency, changedBy, changes);
                     changeSetColl.add(changeSet);
                     changesColl.clear();
@@ -114,7 +114,7 @@ public final class TextfileChangesProvider implements ChangesProvider {
 
         reader.close();
 
-        changeSets = (ChangeSet[]) changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
+        changeSets = changeSetColl.toArray(new ChangeSet[changeSetColl.size()]);
     }
 
     public void save( final OutputStream pOutput ) throws IOException {

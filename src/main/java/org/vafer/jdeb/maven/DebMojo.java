@@ -17,10 +17,12 @@ package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProjectHelper;
@@ -179,7 +181,8 @@ public class DebMojo extends AbstractPluginMojo {
 
     private String openReplaceToken = "[[";
     private String closeReplaceToken = "]]";
-    private Collection dataProducers = new ArrayList();
+    private Collection<DataProducer> dataProducers = new ArrayList<DataProducer>();
+
 
     public void setOpenReplaceToken(String openReplaceToken) {
         this.openReplaceToken = openReplaceToken;
@@ -201,7 +204,7 @@ public class DebMojo extends AbstractPluginMojo {
         }
     }
 
-    protected VariableResolver initializeVariableResolver(Map variables) {
+    protected VariableResolver initializeVariableResolver(Map<String, String> variables) {
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
@@ -222,6 +225,11 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("buildDir", buildDirectory.getAbsolutePath());
         variables.put("project.version", getProject().getVersion());
         variables.put("url", getProject().getUrl());
+        Properties properties = getProject().getProperties();
+        for (Object key : properties.keySet()) {
+            String strKey = (String) key;
+            variables.put(strKey, properties.getProperty(strKey));
+        }
         return new MapVariableResolver(variables);
     }
 
@@ -235,11 +243,14 @@ public class DebMojo extends AbstractPluginMojo {
         setData(dataSet);
 
         try {
-
-            final VariableResolver resolver = initializeVariableResolver(new HashMap());
+            final VariableResolver resolver = initializeVariableResolver(new HashMap<String, String>());
+            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
+            if (!controlDirFile.exists()) {
+                getLog().info(format("%s does not exist. Review the configuration or consider disabling the plugin.", controlDirFile));
+                return;
+            }
 
             final File debFile = new File(Utils.replaceVariables(resolver, deb, openReplaceToken, closeReplaceToken));
-            final File controlDirFile = new File(Utils.replaceVariables(resolver, controlDir, openReplaceToken, closeReplaceToken));
             final File installDirFile = new File(Utils.replaceVariables(resolver, installDir, openReplaceToken, closeReplaceToken));
             final File changesInFile = new File(Utils.replaceVariables(resolver, changesIn, openReplaceToken, closeReplaceToken));
             final File changesOutFile = new File(Utils.replaceVariables(resolver, changesOut, openReplaceToken, closeReplaceToken));

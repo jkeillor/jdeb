@@ -94,7 +94,7 @@
                             </artifactSet>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.apache.commons</pattern>
+                                    <pattern>org.apache.commons.compress</pattern>
                                     <shadedPattern>org.vafer.jdeb.shaded.compress</shadedPattern>
                                 </relocation>
                             </relocations>
@@ -143,7 +143,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.mockito</groupId>
+        	<artifactId>mockito-all</artifactId>
+        	<version>1.8.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

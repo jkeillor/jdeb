@@ -55,9 +55,15 @@ for the syntax of the content. Now if you do a 'mvn clean install' the
 attached 'deb' goal is getting called and the artifacts -the deb and
 potentially the changes file- will automatically get attached to the project.
 
+Note that property replacement will also occur in the 'conffiles' file if it
+is present, allowing a conffiles configuration of the form:
+
+    /etc/[[artifactId]]/[[artifactId]].properties
+    /etc/[[artifactId]]/log4j.xml
+
 The jdeb maven plugin also supports a variety of configuration options. These
 configuration options provide the same features available in the jdeb ant
-task. To configure the jdeb maven plugin, populate the jdeb configuraiton
+task. To configure the jdeb maven plugin, populate the jdeb configuration
 section with any of the following options:
 
     *---------------+------------------------------------------------------------------------------+-----------------------------------------------------+
@@ -98,20 +104,26 @@ more 'data' elements. A 'data' element is used to specify a 'directory', a
 elements to your 'dataSet' as you'd like. The 'data' element has the
 following options:
 
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    ||   Element    || Description                                                                 || Required                                  ||
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | src           | The directory, tarball, or file to include in the package                    | Yes                                         |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | type          | Type of the data source. (archive|directory|file)                            | No; but will be Yes in the future           |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | includes      | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | excludes      | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-    | mapper        | The files to exclude from the directory or tarball                           | No                                          |
-    *---------------+------------------------------------------------------------------------------+---------------------------------------------+
-
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    ||   Element       || Description                                                                 || Required                                  ||
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | src              | The directory, tarball, or file to include in the package                    | Yes for all but type 'literal'              |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | type             | Type of the data source. (archive|directory|file|template)                   | No; but will be Yes in the future           |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | destinationName  | New filename at destination (type must be 'file')                            | No                                          |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | failOnMissingSrc | Fail if src file/folder is missing (true|false)                              | No                                          |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | includes         | A comma seperated list of files to include from the directory or tarball     | No; defaults to all files                   |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | excludes         | A comma seperated list of files to exclude from the directory or tarball     | No; defaults to no exclutions               |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | mapper           | The files to exclude from the directory or tarball                           | No                                          |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    | paths/(path..)   | One or more string literal paths that will created in the package            | No; Yes for type 'literal'                  |
+    *------------------+------------------------------------------------------------------------------+---------------------------------------------+
+    
 There are different kinds of mappers that can be selected via the `type` argument. The most common one is the 'perm' mapper.
 
     *---------------+-------------------------------------------------------+------------------------+
@@ -186,6 +198,16 @@ include a directory, a tarball, and a file in your deb package:
                                 <data>
                                     <src>${project.basedir}/README.txt</src>
                                     <type>file</type>
+                                </data>
+                                <!-- Template example -->
+                                <data>
+                                    <type>template</type>
+                                    <paths>
+                                        <path>/etc/${artifactId}</path>
+                                        <path>/var/lib/${artifactId}</path>
+                                        <path>/var/log/${artifactId}</path>
+                                        <path>/var/run/${artifactId}</path>
+                                    </paths>
                                 </data>
                             </dataSet>
                             ...

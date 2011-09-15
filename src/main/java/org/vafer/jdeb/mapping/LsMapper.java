@@ -34,7 +34,7 @@ import org.apache.tools.tar.TarEntry;
  */
 public final class LsMapper implements Mapper {
 
-    private final Map mapping;
+    private final Map<String, TarEntry> mapping;
 
 
     public final static class ParseError extends Exception {
@@ -189,8 +189,8 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     }
 
-    private Map parse( final InputStream pInput ) throws IOException, ParseError {
-        final Map mapping = new HashMap();
+    private Map<String, TarEntry> parse( final InputStream pInput ) throws IOException, ParseError {
+        final Map<String, TarEntry> mapping = new HashMap<String, TarEntry>();
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(pInput));
 
@@ -228,7 +228,7 @@ drwxr-xr-x    4 tcurdt  tcurdt   136 Jun 25 03:48 classes
 
     public TarEntry map( final TarEntry pEntry ) {
 
-        final TarEntry entry = (TarEntry) mapping.get(pEntry.getName());
+        final TarEntry entry = mapping.get(pEntry.getName());
 
         if (entry != null) {
 
