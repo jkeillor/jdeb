@@ -36,6 +36,18 @@ public abstract class AbstractPluginMojo extends AbstractMojo {
      */
     protected File buildDirectory;
 
+    /**
+     * @parameter expession="$[build.timestamp}"
+     * @return
+     */
+    protected String fragment;
+
+    /**
+     * @parameter default-value=false
+     * @return
+     */
+    protected boolean uniqueVersion;
+
     protected MavenProject getProject() {
         if ( project.getExecutionProject() != null ) {
             return project.getExecutionProject();

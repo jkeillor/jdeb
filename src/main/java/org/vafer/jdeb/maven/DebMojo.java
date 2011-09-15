@@ -17,11 +17,10 @@ package org.vafer.jdeb.maven;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProjectHelper;
@@ -52,7 +51,7 @@ public class DebMojo extends AbstractPluginMojo {
      * substitutions are [[baseDir]] [[buildDir]] [[artifactId]] [[version]]
      * [[extension]] and [[groupId]].
      *
-     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[version]].[[extension]]"
+     * @parameter default-value="[[buildDir]]/[[artifactId]]_[[project.version]].[[extension]]"
      */
     private String deb;
 
@@ -110,7 +109,6 @@ public class DebMojo extends AbstractPluginMojo {
      * @parameter default-value="/opt/[[artifactId]]"
      */
     private String installDir;
-
 
     /**
      * The type of attached artifact
@@ -207,7 +205,17 @@ public class DebMojo extends AbstractPluginMojo {
         variables.put("name", getProject().getName());
         variables.put("artifactId", getProject().getArtifactId());
         variables.put("groupId", getProject().getGroupId());
-        variables.put("version", getProject().getVersion().replace('-', '+'));
+        String version;
+        if( uniqueVersion && getProject().getArtifact().isSnapshot()) {
+            version = getProject().getVersion() + "-" + fragment;
+        }
+        else {
+             version = getProject().getVersion();
+        }
+        getLog().info(version);
+        getLog().info(Boolean.toString(uniqueVersion));
+        getLog().info(fragment);
+        variables.put("version", version.replace('-', '+'));
         variables.put("description", getProject().getDescription());
         variables.put("extension", "deb");
         variables.put("baseDir", getProject().getBasedir().getAbsolutePath());
