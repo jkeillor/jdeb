@@ -15,6 +15,8 @@
  */
 package org.vafer.jdeb.maven;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.text.ParseException;
